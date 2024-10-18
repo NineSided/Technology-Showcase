@@ -21,14 +21,14 @@ surface = pygame.Surface(window_size)
 # MAIN
 gameplay_shader = Shaders.Shader()
 
-g = Particles.ParticleGenerator(pos=[50, 50], image_sequence=["image.bmp"], concentration=100)
+g = Particles.ParticleGenerator(pos=[125, 125], image_sequence=[pygame.image.load("image.bmp").convert_alpha()], concentration=1, min_rot_speed=0, max_rot_speed=30)
 
 while 1:
     surface.fill((0, 0, 0))
 
     g.show(surface)
 
-    pygame.draw.rect(surface, (255, 255, 255), pygame.Rect(50, 50, 50, 50))
+    pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(50, 50, 50, 50))
     pygame.draw.rect(surface, (200, 55, 123), pygame.Rect(150, 150, 50, 50))
 
     for event in pygame.event.get():
@@ -38,6 +38,8 @@ while 1:
 
     # opengl rendering
     gameplay_shader.update()
+
+    surface1 = pygame.transform.rotate(surface, -30)
 
     gameplaytex = gameplay_shader.surf_to_texture(surface)
     gameplaytex.use(0)
