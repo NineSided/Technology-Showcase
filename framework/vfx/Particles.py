@@ -1,49 +1,43 @@
 import pygame, random
-import copy as COPY
+from pygame.locals import *
 
-class Particle:
-    def __init__(self, pos, image):
-        self.pos = pos
-        self.image = image
-        self.angle = 0
+from framework.vfx import Glow
 
 class ParticleGenerator:
-    def __init__(self, pos, image_sequence, image_cycle_type="Randomise", concentration=10, shrink=False, generation_angle=0, min_spread_angle=-15, max_spread_angle=15, min_rand_size=1, max_rand_size=1, min_distance=10, max_distance=30, min_rot_speed=0, max_rot_speed=0):
+    def __init__(self, pos, p, color_=None):
+        if color_ is None:
+            color_ = [255, 255, 255]
         self.pos = pos
 
         self.particle_list = []
-        self.image = image_sequence
-        self.image_cycle_type = image_cycle_type
+        self.p = p
+        self.color = color_
 
-        self.shrink = shrink
-        self.concentration = concentration
+        self.active = False
+        self.ractive = False
 
-        self.generation_angle = generation_angle
+    def generate(self, surface_):
+        if self.active:
+            self.particle_list.append([[self.pos[0], self.pos[1]], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 10), self.color, False])
+        if self.ractive:
+            self.particle_list.append([[self.pos[0], self.pos[1]], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 10), self.color, True])
 
-        self.min_spread_angle = min_spread_angle
-        self.max_spread_angle = max_spread_angle
-
-        self.min_rand_size = min_rand_size
-        self.max_rand_size = max_rand_size
-
-        self.min_distance = min_distance
-        self.max_distance = max_distance
-
-        self.min_rot_speed = min_rot_speed
-        self.max_rot_speed = max_rot_speed
-
-        self.generate()
-
-    def generate(self):
-        for i in range(0, self.concentration):
-            for img in self.image:
-                particle = Particle(pos=(self.pos[0], self.pos[1]), image=img)
-                self.particle_list.append(particle)
-
-    def show(self, surface):
         for particle in self.particle_list:
-            copy = particle.image
-            particle.angle -= 5
-            surf = pygame.transform.rotate(copy, particle.angle)
-            surf2 = pygame.transform.scale(surf, (particle.image.width*2, particle.image.height*2))
-            surface.blit(surf2, [particle.pos[0]-int(copy.get_width()/2), particle.pos[1]-int(copy.get_height()/2)])
+            particle[0][0] += particle[1][0]
+            particle[0][1] += particle[1][1]
+            particle[2] -= 0.1
+            particle[1][1] += 0.1
+
+            if isinstance(self.p, pygame.Surface):
+                surface_.blit(self.p, particle[0])
+            else:
+                pygame.draw.circle(surface_, particle[3], (int(particle[0][0]), int(particle[0][1])), int(particle[2]))
+
+                radius = int(particle[2]*2)
+
+                if particle[4] == True:
+                    surface_.blit(Glow.create_glow(radius, (particle[3][0]/7.5, particle[3][1]/7.5, particle[3][2]/4)), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags=BLEND_RGB_ADD)
+
+            if particle[2] <= 0:
+                self.particle_list.remove(particle)
+
