@@ -1,42 +1,42 @@
-import pygame, random
+import pygame, random, math
 from pygame.locals import *
 
-from framework.vfx import Glow
+from framework.vfx import SurfaceEffects
 
 class ParticleGenerator:
-    def __init__(self, pos, p, color_=None):
+    def __init__(self, pos, color_=None, decay_rate=0.1, direction=0, mspeed=1, gravity=0.1, spread=30, surfaceeffects=[]):
         if color_ is None:
             color_ = [255, 255, 255]
         self.pos = pos
 
         self.particle_list = []
-        self.p = p
         self.color = color_
+        self.decay_rate = decay_rate
+        self.direction = math.radians(direction-90)
+        self.mspeed = mspeed
+        self.gravity = gravity
+        self.spread = spread
+        self.surfaceeffects = surfaceeffects
 
         self.active = False
-        self.ractive = False
 
     def generate(self, surface_):
         if self.active:
-            self.particle_list.append([[self.pos[0], self.pos[1]], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 10), self.color, False])
-        if self.ractive:
-            self.particle_list.append([[self.pos[0], self.pos[1]], [random.randint(0, 20) / 10 - 1, -2], random.randint(4, 10), self.color, True])
+            self.particle_list.append([[self.pos[0], self.pos[1]], [math.cos(self.direction+math.radians(random.randint(0, int(self.spread))-int(self.spread/2)))*self.mspeed, math.sin(self.direction+math.radians(random.randint(0, int(self.spread))-int(self.spread/2)))*self.mspeed], random.randint(4, 10), self.color])
 
         for particle in self.particle_list:
             particle[0][0] += particle[1][0]
             particle[0][1] += particle[1][1]
-            particle[2] -= 0.1
-            particle[1][1] += 0.1
+            particle[2] -= self.decay_rate
+            particle[1][1] += self.gravity
 
-            if isinstance(self.p, pygame.Surface):
-                surface_.blit(self.p, particle[0])
-            else:
-                pygame.draw.circle(surface_, particle[3], (int(particle[0][0]), int(particle[0][1])), int(particle[2]))
+            pygame.draw.circle(surface_, particle[3], (int(particle[0][0]), int(particle[0][1])), int(particle[2]))
+            radius = int(particle[2]*2)
 
-                radius = int(particle[2]*2)
-
-                if particle[4] == True:
-                    surface_.blit(Glow.create_glow(radius, (particle[3][0]/7.5, particle[3][1]/7.5, particle[3][2]/4)), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags=BLEND_RGB_ADD)
+            if len(self.surfaceeffects) > 0 and isinstance(self.surfaceeffects, list):
+                for effect in self.surfaceeffects:
+                    if effect[0] == SurfaceEffects.glow:
+                        surface_.blit(effect[0](eval(str(effect[1])), effect[2]), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags=BLEND_RGB_ADD)
 
             if particle[2] <= 0:
                 self.particle_list.remove(particle)
