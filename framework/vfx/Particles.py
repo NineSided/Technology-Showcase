@@ -35,8 +35,9 @@ class ParticleGenerator:
 
             if len(self.surfaceeffects) > 0 and isinstance(self.surfaceeffects, list):
                 for effect in self.surfaceeffects:
+                    # post-processing
                     if effect[0] == SurfaceEffects.glow:
-                        surface_.blit(effect[0](eval(str(effect[1])), effect[2]), (int(particle[0][0] - radius), int(particle[0][1] - radius)), special_flags=BLEND_RGB_ADD)
+                        surface_.blit(effect[0](eval(str(effect[1])), effect[2]), (int(particle[0][0] - eval(str(effect[1]))), int(particle[0][1] - eval(str(effect[1])))), special_flags=BLEND_RGB_ADD)
 
             if particle[2] <= 0:
                 self.particle_list.remove(particle)

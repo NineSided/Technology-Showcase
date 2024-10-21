@@ -35,7 +35,8 @@ surface = pygame.Surface(window_size)
 if SHADERS:
     gameplay_shader = Shaders.Shader()
 
-g = Particles.ParticleGenerator(pos=pygame.mouse.get_pos(), color_=(255, 255, 255), decay_rate=0.1, direction=0, mspeed=1, gravity=0.1, spread=90, surfaceeffects=[[SurfaceEffects.glow, "radius", (20, 20, 80)]])
+g = Particles.ParticleGenerator(pos=pygame.mouse.get_pos(), color_=(255, 255, 255), decay_rate=0.1, direction=0, mspeed=1, gravity=0.1, spread=90, surfaceeffects=[[SurfaceEffects.glow, "radius", (20, 20, 80)], [SurfaceEffects.glow, "radius*2", (20, 20, 80)]])
+g.active = True
 
 while 1:
     surface.fill((0, 0, 0))
@@ -44,7 +45,6 @@ while 1:
     pygame.draw.rect(surface, (200, 55, 123), pygame.Rect(150, 150, 200, 350))
 
     g.pos = [125, 125]
-    g.active = True
     g.generate(surface)
 
     for event in pygame.event.get():
