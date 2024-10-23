@@ -17,12 +17,13 @@ if SHADERS:
 
 from framework.vfx import Particles
 from framework.vfx import SurfaceEffects
+from framework.maploading import game_maps
 # CONFIG
 
 # SETUP
 clock = pygame.time.Clock()
 
-window_size = [800, 500]
+window_size = [832, 512]
 if SHADERS:
     window = pygame.display.set_mode(window_size, pygame.OPENGL | pygame.DOUBLEBUF)
 elif not SHADERS:
@@ -38,11 +39,20 @@ if SHADERS:
 g = Particles.ParticleGenerator(pos=pygame.mouse.get_pos(), color_=(200, 200, 255), decay_rate=0.1, direction=0, mspeed=1, gravity=0.1, spread=90, min_size=4, max_size=10, surfaceeffects=[[SurfaceEffects.glow, "radius", (20, 20, 80)]])
 g.active = True
 
+tile_index = {"0": None,
+              "1": pygame.image.load("brick.bmp").convert()}
+
+MAP = game_maps.Map("map.txt")
+MAP.generate()
+
 while 1:
     surface.fill((0, 0, 0))
 
     pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(50, 50, 50, 50))
     pygame.draw.rect(surface, (200, 55, 123), pygame.Rect(150, 150, 200, 350))
+
+    mapsurf = MAP.show_map(tile_index, surface)
+    surface.blit(mapsurf, (0, 0))
 
     g.pos = [125, 125]
     g.generate(surface)
