@@ -22,9 +22,11 @@ class ParticleGenerator:
 
         self.active = False
 
-    def generate(self, surface_):
+    def generate(self):
         if self.active:
             self.particle_list.append([[self.pos[0], self.pos[1]], [math.cos(self.direction+math.radians(random.randint(0, int(self.spread))-int(self.spread/2)))*self.mspeed, math.sin(self.direction+math.radians(random.randint(0, int(self.spread))-int(self.spread/2)))*self.mspeed], random.randint(self.min_size, self.max_size), self.color])
+
+    def show(self, surface_):
 
         for particle in self.particle_list:
             particle[0][0] += particle[1][0]

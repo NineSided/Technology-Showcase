@@ -40,7 +40,7 @@ if SHADERS:
     gameplay_shader = Shaders.Shader()
     gui_shader = Shaders.Shader()
 
-g = Particles.ParticleGenerator(pos=pygame.mouse.get_pos(), color_=(200, 200, 255), decay_rate=0.1, direction=0, mspeed=1, gravity=0.1, spread=90, min_size=4, max_size=10, surfaceeffects=[[SurfaceEffects.glow, "radius", (20, 20, 80)], [SurfaceEffects.glow, "radius*1.5", (20, 20, 80)]])
+g = Particles.ParticleGenerator(pos=[125, 125], color_=(200, 200, 255), decay_rate=0.1, direction=0, mspeed=1, gravity=0.1, spread=90, min_size=4, max_size=10, surfaceeffects=[[SurfaceEffects.glow, "radius", (20, 20, 80)], [SurfaceEffects.glow, "radius*1.5", (20, 20, 80)]])
 g.active = True
 
 tile_index = {"0": None,
@@ -50,6 +50,10 @@ MAP = Game_maps.Map("map.txt")
 MAP.generate()
 
 player = Player.Player(rect=pygame.Rect(300, 100, 25, 50))
+k_a = False
+k_d = False
+
+pauseguicontainer = GuiObjects.GuiContainer(pygame.Surface((window_size[0]/2, window_size[1]/2)))
 
 gameguicontainer = GuiObjects.GuiContainer(pygame.Surface((window_size[0]/2, window_size[1]/2)))
 gameguicontainer.children["moveleft"] = GuiObjects.Button(50, 400, 100, 100, name="moveleft")
@@ -65,12 +69,14 @@ while 1:
     mapsurf = MAP.show_map(tile_index, surface)
     surface.blit(mapsurf, (0, 0))
 
-    player.controls.left = gameguicontainer.children["moveleft"].rect.collidepoint((pygame.mouse.get_pos()[0]/2, pygame.mouse.get_pos()[1]/2)) and pygame.mouse.get_pressed()[0]
-    player.controls.right = gameguicontainer.children["moveright"].rect.collidepoint((pygame.mouse.get_pos()[0] / 2, pygame.mouse.get_pos()[1] / 2)) and pygame.mouse.get_pressed()[0]
+    player.controls.left = gameguicontainer.children["moveleft"].rect.collidepoint(
+        (pygame.mouse.get_pos()[0] / 2, pygame.mouse.get_pos()[1] / 2)) and pygame.mouse.get_pressed()[0] or k_a
+    player.controls.right = gameguicontainer.children["moveright"].rect.collidepoint(
+        (pygame.mouse.get_pos()[0] / 2, pygame.mouse.get_pos()[1] / 2)) and pygame.mouse.get_pressed()[0] or k_d
 
-    #player.controls.right = rightrect.collidepoint((pygame.mouse.get_pos()[0]/2, pygame.mouse.get_pos()[1]/2)) and pygame.mouse.get_pressed()[0]
+    g.generate()
+    g.show(surface)
 
-    g.generate(surface)
     player.update(surface)
 
     gameguicontainer.show()
@@ -81,14 +87,14 @@ while 1:
             sys.exit()
         if event.type == KEYDOWN:
             if event.key == K_a:
-                player.controls.left = True
+                k_a = True
             if event.key == K_d:
-                player.controls.right = True
+                k_d = True
         if event.type == KEYUP:
             if event.key == K_a:
-                player.controls.left = False
+                k_a = False
             if event.key == K_d:
-                player.controls.right = False
+                k_d = False
 
     # rendering
     surface.blit(gameguicontainer.surface, (0, 0))
