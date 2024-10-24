@@ -3,14 +3,15 @@ import pygame
 class GuiContainer:
     def __init__(self, parentSurface: pygame.Surface):
         self.surface = pygame.Surface((parentSurface.get_width(), parentSurface.get_height()))
-        self.children = []
+        self.children = {}
 
     def show(self):
-        for child in self.children:
-            child.show(self.surface)
+        for child, value in self.children.items():
+            value.show(self.surface)
 
 class Button:
-    def __init__(self, x, y, height, width, image=None, text=""):
+    def __init__(self, x, y, height, width, image=None, name=None, text=""):
+        self.name = name
         self.width = width
         self.height = height
         self.x = x

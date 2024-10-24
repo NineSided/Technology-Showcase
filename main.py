@@ -51,12 +51,13 @@ MAP.generate()
 
 player = Player.Player(rect=pygame.Rect(300, 100, 25, 50))
 
-guicontainer = GuiObjects.GuiContainer(pygame.Surface((window_size[0]/2, window_size[1]/2)))
-guicontainer.children.append(GuiObjects.Button(100, 100, 100, 100))
+gameguicontainer = GuiObjects.GuiContainer(pygame.Surface((window_size[0]/2, window_size[1]/2)))
+gameguicontainer.children["moveleft"] = GuiObjects.Button(50, 400, 100, 100, name="moveleft")
+gameguicontainer.children["moveright"] = GuiObjects.Button(200, 400, 100, 100, name="moveright")
 
 while 1:
     surface.fill((0, 0, 0))
-    guicontainer.surface.set_colorkey((0, 0, 0))
+    gameguicontainer.surface.set_colorkey((0, 0, 0))
 
     pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(50, 50, 50, 50))
     pygame.draw.rect(surface, (200, 55, 123), pygame.Rect(150, 150, 200, 350))
@@ -64,14 +65,15 @@ while 1:
     mapsurf = MAP.show_map(tile_index, surface)
     surface.blit(mapsurf, (0, 0))
 
-    player.controls.left = guicontainer.children[0].rect.collidepoint((pygame.mouse.get_pos()[0]/2, pygame.mouse.get_pos()[1]/2)) and pygame.mouse.get_pressed()[0]
+    player.controls.left = gameguicontainer.children["moveleft"].rect.collidepoint((pygame.mouse.get_pos()[0]/2, pygame.mouse.get_pos()[1]/2)) and pygame.mouse.get_pressed()[0]
+    player.controls.right = gameguicontainer.children["moveright"].rect.collidepoint((pygame.mouse.get_pos()[0] / 2, pygame.mouse.get_pos()[1] / 2)) and pygame.mouse.get_pressed()[0]
 
     #player.controls.right = rightrect.collidepoint((pygame.mouse.get_pos()[0]/2, pygame.mouse.get_pos()[1]/2)) and pygame.mouse.get_pressed()[0]
 
     g.generate(surface)
     player.update(surface)
 
-    guicontainer.show()
+    gameguicontainer.show()
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -89,7 +91,7 @@ while 1:
                 player.controls.right = False
 
     # rendering
-    surface.blit(guicontainer.surface, (0, 0))
+    surface.blit(gameguicontainer.surface, (0, 0))
     surf = pygame.transform.scale(surface, window_size)
     
     if SHADERS:
